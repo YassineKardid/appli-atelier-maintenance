@@ -1,0 +1,1178 @@
+swagger: '2.0'
+info:
+  title: Appli Atelier
+  description: Backend de l'appli Atelier de Maintenance. Toutes les données sont encapsulées dans une réponse conforme au standard "JSend" (https://labs.omniti.com/labs/jsend)
+  version: 0.0.1
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /roles:
+    get:
+      summary: Récupère les rôles
+      description: Récupère la liste des rôles
+      responses:
+        '200':
+          description: Récupération réussie
+          schema:
+            type: object
+            required:
+              - status
+            properties:
+              status:
+                type: string
+                description: statut selon le standard Jsend
+                enum: [
+                  "success",
+                  "fail",
+                  "error"
+                ]
+              code:
+                type: integer
+                description: code numérique en cas d'erreur selon le standard Jsend
+              message:
+                type: string
+                description: message en cas d'erreur selon le standard Jsend
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/Role'
+        '401':
+          description: Not authenticated
+  /stades:
+    get:
+      summary: Récupère les stades
+      description: Récupère la liste des stades
+      responses:
+        '200':
+          description: Récupération réussie
+          schema:
+            type: object
+            required:
+              - status
+            properties:
+              status:
+                type: string
+                description: statut selon le standard Jsend
+                enum: [
+                  "success",
+                  "fail",
+                  "error"
+                ]
+              code:
+                type: integer
+                description: code numérique en cas d'erreur selon le standard Jsend
+              message:
+                type: string
+                description: message en cas d'erreur selon le standard Jsend
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/Stade'
+        '401':
+          description: Not authenticated
+  /sections:
+    get:
+      summary: Récupère les sections
+      description: Récupère la liste des sections
+      responses:
+        '200':
+          description: Récupération réussie
+          schema:
+            type: object
+            required:
+              - status
+            properties:
+              status:
+                type: string
+                description: statut selon le standard Jsend
+                enum: [
+                  "success",
+                  "fail",
+                  "error"
+                ]
+              code:
+                type: integer
+                description: code numérique en cas d'erreur selon le standard Jsend
+              message:
+                type: string
+                description: message en cas d'erreur selon le standard Jsend
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/Section'
+        '401':
+          description: Not authenticated
+  /actions:
+    get:
+      summary: Récupère les actions existantes
+      description: Récupère la liste des actions existantes
+      parameters:
+        - in: query
+          name: equipment
+          type: integer
+          description: ID de l'équipement pour filtrer les actions
+        - in: query
+          name: search
+          type: string
+          description: début du nom d'une action pour l'autocomplete
+      responses:
+        '200':
+          description: Récupération réussie
+          schema:
+            type: object
+            required:
+              - status
+            properties:
+              status:
+                type: string
+                description: statut selon le standard Jsend
+                enum: [
+                  "success",
+                  "fail",
+                  "error"
+                ]
+              code:
+                type: integer
+                description: code numérique en cas d'erreur selon le standard Jsend
+              message:
+                type: string
+                description: message en cas d'erreur selon le standard Jsend
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: l'id de l'action
+                    name:
+                      type: string
+                      description: nom de l'action
+        '401':
+          description: Not authenticated
+    post:
+      summary: Créer une action
+      description: Créer une nouvelle action
+      parameters:
+        - in: body
+          name: action
+          description: nouvelle action à créer
+          schema:
+            type: object
+            required:
+              - equipmentId
+              - name
+            properties:
+              equipmentId:
+                type: integer
+                description: id de l'équipement concerné par l'action  
+              name:
+                type: string
+                description: le nom de l'action
+      responses:
+        '200':
+          description: Création réussie
+          schema:
+            type: object
+            required:
+              - status
+            properties:
+              status:
+                type: string
+                description: statut selon le standard Jsend
+                enum: [
+                  "success",
+                  "fail",
+                  "error"
+                ]
+              code:
+                type: integer
+                description: code numérique en cas d'erreur selon le standard Jsend
+              message:
+                type: string
+                description: message en cas d'erreur selon le standard Jsend
+              data:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: l'id de l'action
+                  name:
+                    type: string
+                    description: nom de l'action
+        '400':
+          description: Action existe déjà
+        '401':
+          description: Erreur d'authentification
+
+  /users/login:
+    post:
+      summary: Login user
+      description: This WS is used to login users
+      parameters:
+        - in: body
+          name: credentials
+          description: The user credentials
+          schema:
+            type: object
+            required:
+              - username
+              - password
+            properties:
+              username:
+                type: string
+                description: Nom d'utilisateur
+                example: ocp
+              password:
+                type: string
+                description: Mot de passe
+                example: password
+      responses:
+        '200':
+          description: Login réussi
+          schema:
+            type: object
+            required:
+              - status
+            properties:
+              status:
+                type: string
+                description: statut selon le standard Jsend
+                enum: [
+                  "success",
+                  "fail",
+                  "error"
+                ]
+              code:
+                type: integer
+                description: code numérique en cas d'erreur selon le standard Jsend
+              message:
+                type: string
+                description: message en cas d'erreur selon le standard Jsend
+              data:
+                $ref: '#/definitions/User'
+        '401':
+          description: Login échoué
+  /users:
+    get:
+      summary: Liste les utilisateurs
+      description: >-
+        Renvoie la liste des utilisateurs, éventuellement filtrée selon
+        l'utilisateur connecté et les paramètres de filtre
+      parameters:
+        - in: query
+          name: section
+          type: integer
+          description: filtre par Section
+        - in: query
+          name: role
+          type: integer
+          description: filtre par Rôle
+        - in: query
+          name: search
+          type: string
+          description: 'chaîne à rechercher dans le Username, Nom ou Prénom des utilisateurs'
+      responses:
+        '200':
+          description: Liste d'utilisateurs correspondant
+          schema:
+            type: object
+            required:
+              - status
+            properties:
+              status:
+                type: string
+                description: statut selon le standard Jsend
+                enum: [
+                  "success",
+                  "fail",
+                  "error"
+                ]
+              code:
+                type: integer
+                description: code numérique en cas d'erreur selon le standard Jsend
+              message:
+                type: string
+                description: message en cas d'erreur selon le standard Jsend
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/User'
+        '401':
+          description: Accès non autorisé
+  /ots:
+    get:
+      summary: Liste des OT
+      description: Récupère les OT pour l'utilisateur connecté
+      parameters:
+        - in: query
+          name: stade
+          type: integer
+          description: Filtre les OT par stade
+        - in: query
+          name: section
+          type: integer
+          description: Filtre les OT par section
+        - in: query
+          name: date_from
+          type: string
+          description: Uniquement les OT depuis cette date
+        - in: query
+          name: date_to
+          type: string
+          description: Uniquement les OT jusqu'à cette date
+        - in: query
+          name: scheduled
+          type: boolean
+          description: Filtre uniquement les OT planifiés ou non
+        - in: query
+          name: type
+          type: string
+          description: Filtre par type de maintenance
+        - in: query
+          name: priority
+          type: string
+          description: Filtre par priorité
+        - in: query
+          name: status
+          type: string
+          description: Filtre par Statut
+        - in: query
+          name: sort
+          type: string
+          description: Champ de tri des OT
+      responses:
+        '200':
+          description: Liste d'OT
+          schema:
+            type: object
+            required:
+              - status
+            properties:
+              status:
+                type: string
+                description: statut selon le standard Jsend
+                enum: [
+                  "success",
+                  "fail",
+                  "error"
+                ]
+              code:
+                type: integer
+                description: code numérique en cas d'erreur selon le standard Jsend
+              message:
+                type: string
+                description: message en cas d'erreur selon le standard Jsend
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/OT'
+        '401':
+          description: Accès non autorisé
+    post:
+      summary: Créer un nouvel OT
+      description: Crée un nouvel OT
+      parameters:
+        - in: body
+          name: ot
+          description: Structure OT
+          schema:
+            $ref: '#/definitions/OT'
+      responses:
+        '200':
+          description: l'OT créé
+          schema:
+            type: object
+            required:
+              - status
+            properties:
+              status:
+                type: string
+                description: statut selon le standard Jsend
+                enum: [
+                  "success",
+                  "fail",
+                  "error"
+                ]
+              code:
+                type: integer
+                description: code numérique en cas d'erreur selon le standard Jsend
+              message:
+                type: string
+                description: message en cas d'erreur selon le standard Jsend
+              data:
+                $ref: '#/definitions/OT'
+        '400':
+          description: Création impossible (par ex champs manquantes)
+        '401':
+          description: Accès non autorisé
+        '403':
+          description: Permissions insuffisantes pour créé un OT      
+  '/ots/{id}':
+    get:
+      summary: Récupère un OT
+      description: Récupère un OT
+      parameters:
+        - in: path
+          name: id
+          type: integer
+          required: true
+          description: ID de l'OT à récupérer
+      responses:
+        '200':
+          description: l'OT demandé
+          schema:
+            type: object
+            required:
+              - status
+            properties:
+              status:
+                type: string
+                description: statut selon le standard Jsend
+                enum: [
+                  "success",
+                  "fail",
+                  "error"
+                ]
+              code:
+                type: integer
+                description: code numérique en cas d'erreur selon le standard Jsend
+              message:
+                type: string
+                description: message en cas d'erreur selon le standard Jsend
+              data:
+                $ref: '#/definitions/OT'
+        '401':
+          description: Accès non autorisé
+        '403':
+          description: Permissions insuffisantes pour accéder à cet OT
+    post:
+      summary: Modifier un OT
+      description: Modifier l'ensemble des champs d'un OT
+      parameters:
+        - in: path
+          name: id
+          type: integer
+          required: true
+          description: ID de l'OT à modifier
+        - in: body
+          name: ot
+          description: Structure OT
+          schema:
+            $ref: '#/definitions/OT'
+      responses:
+        '200':
+          description: l'OT modifié
+          schema:
+            type: object
+            required:
+              - status
+            properties:
+              status:
+                type: string
+                description: statut selon le standard Jsend
+                enum: [
+                  "success",
+                  "fail",
+                  "error"
+                ]
+              code:
+                type: integer
+                description: code numérique en cas d'erreur selon le standard Jsend
+              message:
+                type: string
+                description: message en cas d'erreur selon le standard Jsend
+              data:
+                $ref: '#/definitions/OT'
+        '400':
+          description: >-
+            Modification interdite (par exemple car l'état courant de l'OT
+            n'autorise pas d'effectuer les modifications demandées)
+        '401':
+          description: Accès non autorisé
+        '403':
+          description: Permissions insuffisantes pour modifier cet OT
+  /ots/schedule:
+    post:
+      summary: Décaler un OT
+      description: Change la date planifiée de l'OT
+      parameters:
+        - in: body
+          name: data
+          description: OT à décaler ainsi que la nouvelle date
+          schema:
+            type: object
+            required:
+              - id
+              - scheduledDate
+            properties:
+              id:
+                type: integer
+                description: ID de l'OT à décaler
+                example: 4
+              scheduledDate:
+                type: string
+                description: Nouvelle date planifiée de l'OT
+                example: '2018-09-23'
+              comment:
+                type: string
+                description: Commentaire (cause du décalage par ex.)
+      responses:
+        '200':
+          description: renvoie l'OT modifié
+          schema:
+            type: object
+            required:
+              - status
+            properties:
+              status:
+                type: string
+                description: statut selon le standard Jsend
+                enum: [
+                  "success",
+                  "fail",
+                  "error"
+                ]
+              code:
+                type: integer
+                description: code numérique en cas d'erreur selon le standard Jsend
+              message:
+                type: string
+                description: message en cas d'erreur selon le standard Jsend
+              data:
+                $ref: '#/definitions/OT'
+        '400':
+          description: Action impossible (par exemple car l'OT est déjà terminé)
+        '401':
+          description: Accès non autorisé
+        '403':
+          description: Permissions insuffisantes pour modifier cet OT
+  /ots/status:
+    post:
+      summary: Changer le statut d'un OT
+      description: >-
+        Change le statut d'un OT - passer en lancé, en provisoire si nécessite
+        une préparation, annuler l'OT...
+      parameters:
+        - in: body
+          name: data
+          description: OT à modifier ainsi que le nouveau statut
+          schema:
+            type: object
+            required:
+              - id
+              - status
+            properties:
+              id:
+                type: integer
+                description: ID de l'OT à modifier
+                example: 4
+              status:
+                type: string
+                description: 'Nouveau statut (lancé, annulé, provisoire...)'
+                example: lance
+      responses:
+        '200':
+          description: renvoie l'OT modifié
+          schema:
+            type: object
+            required:
+              - status
+            properties:
+              status:
+                type: string
+                description: statut selon le standard Jsend
+                enum: [
+                  "success",
+                  "fail",
+                  "error"
+                ]
+              code:
+                type: integer
+                description: code numérique en cas d'erreur selon le standard Jsend
+              message:
+                type: string
+                description: message en cas d'erreur selon le standard Jsend
+              data:
+                $ref: '#/definitions/OT'
+        '400':
+          description: Action impossible (par exemple car l'OT est déjà terminé)
+        '401':
+          description: Accès non autorisé
+        '403':
+          description: Permissions insuffisantes pour modifier cet OT
+  /ots/atelier:
+    post:
+      summary: Changer l'OT d'atelier
+      description: Affecter l'OT à un autre atelier
+      parameters:
+        - in: body
+          name: data
+          description: OT à modifier ainsi que le nouvel atelier
+          schema:
+            type: object
+            required:
+              - id
+              - stade
+              - section
+            properties:
+              id:
+                type: integer
+                description: ID de l'OT à modifier
+                example: 4
+              stade:
+                type: integer
+                description: Nouveau stade
+              section:
+                type: integer
+                description: Nouvelle section
+      responses:
+        '200':
+          description: renvoie l'OT modifié
+          schema:
+            type: object
+            required:
+              - status
+            properties:
+              status:
+                type: string
+                description: statut selon le standard Jsend
+                enum: [
+                  "success",
+                  "fail",
+                  "error"
+                ]
+              code:
+                type: integer
+                description: code numérique en cas d'erreur selon le standard Jsend
+              message:
+                type: string
+                description: message en cas d'erreur selon le standard Jsend
+              data:
+                $ref: '#/definitions/OT'
+        '400':
+          description: Action impossible (par exemple car l'OT est déjà terminé)
+        '401':
+          description: Accès non autorisé
+        '403':
+          description: Permissions insuffisantes pour modifier cet OT
+  /ots/start:
+    post:
+      summary: Démarrer un OT
+      description: Démarrer les travaux de l'OT
+      parameters:
+        - in: body
+          name: data
+          description: OT à démarrer
+          schema:
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                type: integer
+                description: ID de l'OT à démarrer
+                example: 4
+      responses:
+        '200':
+          description: renvoie l'OT modifié
+          schema:
+            type: object
+            required:
+              - status
+            properties:
+              status:
+                type: string
+                description: statut selon le standard Jsend
+                enum: [
+                  "success",
+                  "fail",
+                  "error"
+                ]
+              code:
+                type: integer
+                description: code numérique en cas d'erreur selon le standard Jsend
+              message:
+                type: string
+                description: message en cas d'erreur selon le standard Jsend
+              data:
+                $ref: '#/definitions/OT'
+        '400':
+          description: >-
+            Action impossible (par exemple car l'OT est déjà terminé, ou déjà
+            démarré)
+        '401':
+          description: Accès non autorisé
+        '403':
+          description: Permissions insuffisantes pour modifier cet OT
+  /ots/end:
+    post:
+      summary: Terminer un OT
+      description: Terminer les travaux de l'OT
+      parameters:
+        - in: body
+          name: data
+          description: OT à terminer
+          schema:
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                type: integer
+                description: ID de l'OT à terminer
+                example: 4
+      responses:
+        '200':
+          description: renvoie l'OT modifié
+          schema:
+            type: object
+            required:
+              - status
+            properties:
+              status:
+                type: string
+                description: statut selon le standard Jsend
+                enum: [
+                  "success",
+                  "fail",
+                  "error"
+                ]
+              code:
+                type: integer
+                description: code numérique en cas d'erreur selon le standard Jsend
+              message:
+                type: string
+                description: message en cas d'erreur selon le standard Jsend
+              data:
+                $ref: '#/definitions/OT'
+        '400':
+          description: >-
+            Action impossible (par exemple car l'OT est déjà terminé, ou pas
+            encore démarré)
+        '401':
+          description: Accès non autorisé
+        '403':
+          description: Permissions insuffisantes pour modifier cet OT
+  /ots/pause:
+    post:
+      summary: Mettre en pause un OT
+      description: Mettre les travaux de l'OT en pause
+      parameters:
+        - in: body
+          name: data
+          description: OT à mettre en pause
+          schema:
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                type: integer
+                description: ID de l'OT à mettre en pause
+                example: 4
+      responses:
+        '200':
+          description: renvoie l'OT modifié
+          schema:
+            type: object
+            required:
+              - status
+            properties:
+              status:
+                type: string
+                description: statut selon le standard Jsend
+                enum: [
+                  "success",
+                  "fail",
+                  "error"
+                ]
+              code:
+                type: integer
+                description: code numérique en cas d'erreur selon le standard Jsend
+              message:
+                type: string
+                description: message en cas d'erreur selon le standard Jsend
+              data:
+                $ref: '#/definitions/OT'
+        '400':
+          description: >-
+            Action impossible (par exemple car l'OT est déjà terminé, ou pas
+            encore démarré)
+        '401':
+          description: Accès non autorisé
+        '403':
+          description: Permissions insuffisantes pour modifier cet OT
+  /ots/resume:
+    post:
+      summary: Reprendre un OT en pause
+      description: Reprendre les travaux de l'OT en pause
+      parameters:
+        - in: body
+          name: data
+          description: OT à reprendre
+          schema:
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                type: integer
+                description: ID de l'OT à reprendre
+      responses:
+        '200':
+          description: renvoie l'OT modifié
+          schema:
+            type: object
+            required:
+              - status
+            properties:
+              status:
+                type: string
+                description: statut selon le standard Jsend
+                enum: [
+                  "success",
+                  "fail",
+                  "error"
+                ]
+              code:
+                type: integer
+                description: code numérique en cas d'erreur selon le standard Jsend
+              message:
+                type: string
+                description: message en cas d'erreur selon le standard Jsend
+              data:
+                $ref: '#/definitions/OT'
+        '400':
+          description: >-
+            Action impossible (par exemple car l'OT est déjà terminé, ou pas en
+            pause)
+        '401':
+          description: Accès non autorisé
+        '403':
+          description: Permissions insuffisantes pour modifier cet OT
+  /ots/assign:
+    post:
+      summary: Affecter un OT
+      description: Affecter un OT à un chef d'équipe et assigner des opérateurs à un OT
+      parameters:
+        - in: body
+          name: data
+          description: Chef d'équipe et opérateurs
+          schema:
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                type: integer
+                description: ID de l'OT à affecter
+              teamLeadId:
+                type: integer
+                description: ID du chef d'équipe
+              operators:
+                type: array
+                items:
+                  type: integer
+                  description: liste d'id des opérateurs à assigner à l'OT
+      responses:
+        '200':
+          description: renvoie l'OT modifié
+          schema:
+            type: object
+            required:
+              - status
+            properties:
+              status:
+                type: string
+                description: statut selon le standard Jsend
+                enum: [
+                  "success",
+                  "fail",
+                  "error"
+                ]
+              code:
+                type: integer
+                description: code numérique en cas d'erreur selon le standard Jsend
+              message:
+                type: string
+                description: message en cas d'erreur selon le standard Jsend
+              data:
+                $ref: '#/definitions/OT'
+        '400':
+          description: Action impossible
+        '401':
+          description: Accès non autorisé
+        '403':
+          description: Permissions insuffisantes pour modifier cet OT
+  /ots/comment:
+    post:
+      summary: Commenter un OT
+      description: Ajouter un commentaire à un OT
+      parameters:
+        - in: body
+          name: comment
+          description: Commentaire et identifiant de l'OT
+          schema:
+            type: object
+            required:
+              - id
+              - comment
+            properties:
+              id:
+                type: integer
+                description: ID de l'OT où ajouter le commentaire
+              comment:
+                type: string
+                description: Commentaire à ajouter
+      responses:
+        '200':
+          description: renvoie le commentaire
+          schema:
+            type: object
+            required:
+              - status
+            properties:
+              status:
+                type: string
+                description: statut selon le standard Jsend
+                enum: [
+                  "success",
+                  "fail",
+                  "error"
+                ]
+              code:
+                type: integer
+                description: code numérique en cas d'erreur selon le standard Jsend
+              message:
+                type: string
+                description: message en cas d'erreur selon le standard Jsend
+              data:
+                $ref: '#/definitions/Comment'
+        '400':
+          description: Action impossible
+        '401':
+          description: Accès non autorisé
+        '403':
+          description: Permissions insuffisantes pour modifier cet OT
+definitions:
+  Role:
+    type: object
+    description: Role d'un utilisateur
+    properties:
+      id:
+        type: integer
+        description: Identifiant
+        example: 4
+      name:
+        type: string
+        description: Nom du rôle
+        example: Opérateur
+  Stade:
+    type: object
+    description: Stade de production
+    properties:
+      id:
+        type: integer
+        description: Identifiant
+        example: 4
+      name:
+        type: string
+        description: Nom du stade
+        example: Défruitage
+      sections:
+        type: array
+        items:
+          $ref: '#/definitions/Section' 
+      imgUrl:
+        type: string
+        description: URL of the image that represents this Stade
+        example: http://example.com/bulldozer.png
+  Section:
+    type: object
+    description: Section
+    properties:
+      id:
+        type: integer
+        description: Identifiant
+        example: 4
+      name:
+        type: string
+        description: Nom de la section
+        example: Mécanique
+  User:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: The user ID.
+        example: 4
+      username:
+        type: string
+        description: The user name.
+        example: rcriton
+      firstname:
+        type: string
+        description: Prénom
+        example: Romain
+      lastname:
+        type: string
+        description: Nom de famille
+        example: Criton
+      email:
+        type: string
+        description: Adresse e-mail
+        example: rcriton@example.com
+      role:
+        $ref: '#/definitions/Role'
+      stade:
+        $ref: '#/definitions/Stade'
+      section:
+        $ref: '#/definitions/Section'
+      photo:
+        type: string
+        description: URL de la photo de l'utilisateur
+        example: 'http://www.example.com/photo.jpg'
+  Document:
+    type: object
+    description: Document descrivant une procédure de maintenance
+    properties:
+      id:
+        type: integer
+        description: Identifiant
+        example: 44
+      link:
+        type: string
+        description: Lien vers le document
+        example: 'http://www.example.com/procedure.pdf'
+      title:
+        type: string
+        description: Titre
+        example: Procédure de changement de roue
+      description:
+        type: string
+        description: Titre
+        example: Procédure de changement de roue sur le camion Komatsu
+      mime:
+        type: string
+        description: MIME Type
+        example: application/vnd.ms-excel
+  Equipment:
+    type: object
+    description: Machine ou Engin
+    properties:
+      id:
+        type: integer
+        description: Identifiant
+        example: 78
+      name:
+        type: string
+        description: Nom de l'équipement
+        example: Komatsu XB57-10
+  OT:
+    type: object
+    description: Ordre de Travaux
+    properties:
+      id:
+        type: integer
+        description: Identifiant
+        example: 7
+      workStatus:
+        type: string
+        enum: [
+          "notStarted",
+          "started",
+          "paused",
+          "finished"
+        ]
+        description: 'Statut des travaux'
+        example: started
+      priority:
+        type: string
+        enum: [
+          "low",
+          "normal",
+          "critical"
+        ]
+        description: Priorité de l'OT
+        example: critical
+      maintenanceType:
+        type: string
+        enum: [
+          "curative",
+          "systematic",
+          "conditional"
+        ]
+        description: Type de maintenance
+        example: curative
+      withStop:
+        type: boolean
+        description: Avec ou sans arrêt
+        example: false
+      status:
+        type: string
+        enum: [
+          "launched",
+          "notLaunched",
+          "provisional"
+        ]
+        description: 'OT lancé, non-lancé, provisoire (nécessite préparation)'
+        example: lance
+      uoEstimated:
+        type: integer
+        description: Unités d'Oeuvre estimées
+        example: 16
+      uoActual:
+        type: integer
+        description: Unités d'Oeuvre réelles
+        example: 22
+      scheduledDate:
+        type: string
+        description: Date planifiée
+        example: '2018-09-24'
+      start:
+        type: string
+        description: Date et heure de début
+        example: '2018-08-23T18:25:43.511Z'
+      end:
+        type: string
+        description: Date et heure de fin
+        example: '2018-08-23T20:25:43.511Z'
+      stade:
+        $ref: '#/definitions/Stade'
+      section:
+        $ref: '#/definitions/Section'
+      equipment:
+        $ref: '#/definitions/Equipment'
+      teamLead:
+        $ref: '#/definitions/User'
+      operators:
+        type: array
+        items:
+          $ref: '#/definitions/User'
+      documents:
+        type: array
+        items:
+          $ref: '#/definitions/Document'
+      comments:
+        type: array
+        items:
+          $ref: '#/definitions/Comment'
+  Comment:
+    type: object
+    description: Commentaire sur un OT
+    properties:
+      id:
+        type: integer
+        description: ID du commentaire
+      text:
+        type: string
+        description: Contenu du commentaire
+      date:
+        type: string
+        description: Date du commentaire
+        example: '2018-10-28T11:23:47.567Z'
+      author:
+        $ref: '#/definitions/User'

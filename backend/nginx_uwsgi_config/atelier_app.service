@@ -1,0 +1,12 @@
+[Unit]
+Description=uWSGI instance to serve atelier_app
+After=network.target
+
+[Service]
+User=yassine
+Group=www-data
+WorkingDirectory= /home/yassine/Desktop/atelier_new_design/backend
+ExecStart=/usr/local/bin/uwsgi --ini uwsgi.ini
+
+[Install]
+WantedBy=multi-user.target

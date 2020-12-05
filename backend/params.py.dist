@@ -1,0 +1,7 @@
+
+password="root"
+user="root"
+databaseName="project"
+host="localhost"
+port=5000
+MySQLDriver="mysql+mysqldb"
